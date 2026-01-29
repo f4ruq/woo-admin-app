@@ -103,7 +103,7 @@ http://127.0.0.1:8000/docs
 - The frontend is intentionally excluded from this repository
 - WooCommerce API keys must have write permissions enabled
 
-Note: The entire frontend was built using a vibe-coding approach. I am not a frontend developer, and the UI was created pragmatically with help from multiple LLMs and Google Stitch, focusing on functionality rather than frontend best practices.
+The entire frontend was built using a vibe-coding approach. I am not a frontend developer, and the UI was created pragmatically with help from multiple LLMs and Google Stitch, focusing on functionality rather than frontend best practices.
 ---
 
 <img width="1369" height="690" alt="Ekran Resmi 2026-01-30 00 45 41" src="https://github.com/user-attachments/assets/9ec79434-8a9c-48d5-9484-6aaa61d29874" />
