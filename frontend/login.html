@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>WooCommerce Admin Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#137fec",
+            "background-dark": "#101922"
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="font-display bg-background-dark min-h-screen flex items-center justify-center">
+
+<main class="w-full max-w-[400px]">
+
+  <h2 class="text-white text-2xl font-bold text-center mb-6">
+    WooCommerce Admin
+  </h2>
+
+  <div class="bg-[#1c242f] rounded-xl p-6 border border-gray-800">
+    <form class="flex flex-col gap-4">
+
+      <!-- USERNAME -->
+      <label class="flex flex-col gap-1">
+        <span class="text-sm text-gray-300">Username</span>
+        <input
+          id="username"
+          type="text"
+          class="h-11 rounded-lg bg-[#111418] border border-[#3b4754] px-4 text-white"
+          placeholder="admin"
+        />
+      </label>
+
+      <!-- PASSWORD -->
+      <label class="flex flex-col gap-1">
+        <span class="text-sm text-gray-300">Password</span>
+        <div class="relative">
+          <input
+            id="password"
+            type="password"
+            class="h-11 w-full rounded-lg bg-[#111418] border border-[#3b4754] px-4 pr-12 text-white"
+            placeholder="********"
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          >
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+        </div>
+      </label>
+
+      <!-- LOGIN BUTTON -->
+      <button
+        id="loginBtn"
+        type="button"
+        class="mt-4 h-11 rounded-lg bg-primary text-white font-semibold hover:bg-blue-600"
+      >
+        Log In
+      </button>
+
+    </form>
+  </div>
+</main>
+
+<script>
+  const loginBtn = document.getElementById("loginBtn");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const togglePasswordBtn = document.getElementById("togglePassword");
+
+  togglePasswordBtn.addEventListener("click", () => {
+    passwordInput.type =
+      passwordInput.type === "password" ? "text" : "password";
+  });
+
+  loginBtn.addEventListener("click", async () => {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+      alert("Kullanıcı adı ve şifre zorunlu");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        alert("Login başarısız");
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("access_token", data.access_token);
+
+      localStorage.setItem("access_token", data.access_token);
+      window.location.href = "dashboard.html";
+
+      // BURADA DASHBOARD'A YÖNLENDİRECEĞİZ
+      // window.location.href = "dashboard.html";
+
+    } catch (err) {
+      alert("Backend'e bağlanılamadı");
+      console.error(err);
+    }
+  });
+</script>
+
+</body>
+</html>

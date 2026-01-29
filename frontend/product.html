@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Product</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#101922] text-white font-[Inter] pb-32">
+
+<header class="sticky top-0 bg-[#101922] border-b border-gray-800 z-10">
+  <div class="max-w-md mx-auto flex justify-between items-center px-4 h-16">
+    <button id="backBtn" class="text-blue-400">← Back</button>
+    <h1 class="font-bold">Edit Product</h1>
+    <button id="topSaveBtn" class="text-blue-400">Save</button>
+  </div>
+</header>
+
+<main class="max-w-md mx-auto px-4 space-y-6 mt-6">
+
+<!-- BASIC INFO -->
+<section class="bg-[#1a242e] rounded-xl p-4 space-y-4">
+  <div>
+    <label class="text-sm text-gray-400">Product Name</label>
+    <input id="name" class="w-full bg-transparent text-lg border-none focus:ring-0"/>
+  </div>
+
+  <div>
+    <label class="text-sm text-gray-400">Description</label>
+    <textarea id="description" class="w-full bg-transparent min-h-[120px] resize-none"></textarea>
+  </div>
+</section>
+
+<!-- PRICE & STOCK -->
+<section class="bg-[#1a242e] rounded-xl p-4 space-y-4">
+  <div class="flex justify-between items-center">
+    <span>Price (₺)</span>
+    <input id="price" type="number" class="bg-transparent text-right w-24"/>
+  </div>
+
+  <div class="flex justify-between items-center">
+    <span>Out of Stock</span>
+    <input id="outOfStock" type="checkbox"/>
+  </div>
+</section>
+
+<!-- MEDIA -->
+<section class="bg-[#1a242e] rounded-xl p-4">
+  <h3 class="text-sm text-gray-400 mb-3">Product Images</h3>
+  <div id="images" class="grid grid-cols-3 gap-3"></div>
+  <p class="text-xs text-gray-500 mt-2">
+    Görsel ekleme Woo API tarafından desteklenmez. Sadece mevcut görselleri kaldırabilirsin.
+  </p>
+</section>
+
+<button id="deleteBtn" class="w-full border border-red-500 text-red-500 py-3 rounded-xl">
+  Delete Product
+</button>
+
+</main>
+
+<div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+  <button id="saveBtn" class="w-full bg-blue-500 py-4 rounded-xl font-bold">
+    Save Changes
+  </button>
+</div>
+
+<script src="./js/api.js"></script>
+<script src="./js/product.js"></script>
+</body>
+</html>

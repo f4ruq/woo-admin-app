@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#137fec",
+            "background-dark": "#101922",
+            "surface-dark": "#19232d",
+            "card-dark": "#1c252e",
+          },
+          fontFamily: { display: ["Inter", "sans-serif"] },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { min-height: max(884px, 100dvh); }
+    /* iOS safe area */
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+
+<body class="bg-background-dark font-display antialiased text-white">
+  <div class="min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-800 bg-background-dark/95 px-4 py-3 backdrop-blur">
+      <button id="backBtn" class="flex size-10 items-center justify-center rounded-full hover:bg-white/10 transition-colors" type="button" aria-label="Back">
+        <span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+      </button>
+
+      <h2 id="orderTitle" class="flex-1 text-center text-lg font-bold leading-tight">Order</h2>
+
+      <button id="moreBtn" class="flex size-10 items-center justify-center rounded-full hover:bg-white/10 transition-colors" type="button" aria-label="More">
+        <span class="material-symbols-outlined text-2xl">more_horiz</span>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="flex flex-col gap-6 p-4 pb-24">
+
+      <!-- LOADING / ERROR -->
+      <section id="stateBox" class="hidden rounded-xl border border-slate-800 bg-card-dark p-4">
+        <p id="stateText" class="text-sm text-slate-300"></p>
+      </section>
+
+      <!-- STATUS & ACTION -->
+      <section class="rounded-xl border border-slate-800 bg-card-dark p-4 shadow-sm">
+        <div class="flex flex-col gap-4">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-slate-400">Order Status</span>
+            <div class="relative">
+              <select id="statusSelect"
+                class="w-full appearance-none rounded-lg border border-slate-600 bg-[#252e38] py-3 pl-4 pr-10 text-base font-medium focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="on-hold">On Hold</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="refunded">Refunded</option>
+                <option value="failed">Failed</option>
+              </select>
+
+              <span class="pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 items-center text-slate-400">
+                <span class="material-symbols-outlined">expand_more</span>
+              </span>
+            </div>
+          </label>
+
+          <button id="saveBtn"
+            class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-base font-bold text-white transition-colors hover:bg-blue-600 active:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            type="button">
+            <span class="material-symbols-outlined text-[20px]">save</span>
+            Save Changes
+          </button>
+
+          <p id="saveHint" class="hidden text-xs text-slate-400"></p>
+        </div>
+      </section>
+
+      <!-- CUSTOMER + SHIPPING -->
+      <section>
+        <h3 class="mb-3 px-1 text-base font-bold">Customer Details</h3>
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-card-dark shadow-sm">
+          <!-- Customer row -->
+          <div class="flex items-center justify-between border-b border-slate-700/70 p-4">
+            <div class="flex items-center gap-4">
+              <div class="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-slate-700" id="custAvatar">
+                <div class="h-full w-full grid place-items-center text-slate-300 text-sm font-semibold" id="custInitials">--</div>
+              </div>
+              <div class="flex flex-col">
+                <p id="customerName" class="text-base font-semibold leading-tight">-</p>
+                <a id="customerEmail" class="text-sm font-medium text-primary hover:underline" href="#">-</a>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button id="mailBtn" class="flex size-9 items-center justify-center rounded-full bg-slate-700/70 text-slate-200 hover:bg-slate-600 transition-colors" type="button" aria-label="Mail">
+                <span class="material-symbols-outlined text-[20px]">mail</span>
+              </button>
+              <button id="callBtn" class="flex size-9 items-center justify-center rounded-full bg-slate-700/70 text-slate-200 hover:bg-slate-600 transition-colors" type="button" aria-label="Call">
+                <span class="material-symbols-outlined text-[20px]">call</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Addresses -->
+          <div class="p-4 grid gap-4">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-primary">
+                <span class="material-symbols-outlined text-[20px]">location_on</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Shipping Address</span>
+                <p id="shippingAddress" class="mt-1 text-sm leading-relaxed text-slate-200">-</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-primary">
+                <span class="material-symbols-outlined text-[20px]">home_pin</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Billing Address</span>
+                <p id="billingAddress" class="mt-1 text-sm leading-relaxed text-slate-200">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CUSTOM FIELDS (Senin wp-admin meta alanları) -->
+      <section>
+        <h3 class="mb-3 px-1 text-base font-bold">Teslimat ve Notlar</h3>
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-card-dark shadow-sm">
+          <div class="grid gap-3 p-5">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Teslimat Tarihi</span>
+              <span id="teslimatTarihi" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Teslimat Saati</span>
+              <span id="teslimatSaati" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="h-px w-full bg-slate-700/60"></div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Gönderen İsim</span>
+              <span id="gonderenIsim" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Gönderen Telefon</span>
+              <span id="gonderenTelefon" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Alıcı İsim</span>
+              <span id="aliciIsim" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Alıcı Telefon</span>
+              <span id="aliciTelefon" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Gönderim Yeri</span>
+              <span id="gonderimYeri" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">Mahalle</span>
+              <span id="billingNeighborhood" class="font-medium text-white">-</span>
+            </div>
+
+            <div class="flex items-start justify-between gap-4 text-sm">
+              <span class="text-slate-400 shrink-0">Adres (meta)</span>
+              <span id="adresMeta" class="font-medium text-white text-right">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ITEMS -->
+      <section>
+        <h3 class="mb-3 px-1 text-base font-bold">Items</h3>
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-card-dark shadow-sm">
+          <div id="itemsContainer" class="divide-y divide-slate-700/70">
+            <!-- JS dolduracak -->
+          </div
+          ></div>
+      </section>
+
+      <!-- SUMMARY -->
+      <section class="pb-6">
+        <h3 class="mb-3 px-1 text-base font-bold">Summary</h3>
+
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-card-dark shadow-sm">
+          <div class="flex flex-col gap-3 p-5">
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Subtotal</span>
+              <span id="subtotal" class="font-medium">-</span>
+            </div>
+
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Shipping</span>
+              <span id="shippingTotal" class="font-medium">-</span>
+            </div>
+
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Tax</span>
+              <span id="taxTotal" class="font-medium">-</span>
+            </div>
+
+            <div class="my-1 h-px w-full bg-slate-700/60"></div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-base font-bold">Grand Total</span>
+              <span id="orderTotal" class="text-xl font-bold text-primary">-</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/35 px-5 py-3">
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+              <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+              <span id="paymentInfo">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-surface-dark border-t border-slate-800 pb-safe">
+      <div class="flex justify-around items-center h-16 pb-2">
+      
+
+        <a href="dashboard.html" class="flex flex-col items-center justify-center w-full h-full gap-1 text-primary">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size:24px;">shopping_bag</span>
+          <span class="text-[10px] font-medium">Orders</span>
+        </a>
+
+        <a href="products.html" class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400 hover:text-primary transition-colors">
+          <span class="material-symbols-outlined" style="font-size:24px;">inventory_2</span>
+          <span class="text-[10px] font-medium">Products</span>
+        </a>
+      </div>
+    </nav>
+
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("id");
+
+    if (!orderId) {
+      window.location.href = "dashboard.html";
+    }
+
+    const els = (id) => document.getElementById(id);
+
+    function showState(message) {
+      els("stateBox").classList.remove("hidden");
+      els("stateText").textContent = message;
+    }
+
+    function hideState() {
+      els("stateBox").classList.add("hidden");
+      els("stateText").textContent = "";
+    }
+
+    function safeText(v) {
+      if (v === null || v === undefined) return "-";
+      const s = String(v).trim();
+      return s.length ? s : "-";
+    }
+
+    function money(v, currencySymbol = "₺") {
+      const s = safeText(v);
+      if (s === "-") return "-";
+      // Woo bazen string "900.00" döner; biz sembol ekleyelim
+      return `${currencySymbol}${s}`;
+    }
+
+    function getMeta(order, key) {
+      const arr = order && Array.isArray(order.meta_data) ? order.meta_data : [];
+      const found = arr.find(m => m && m.key === key);
+      return found ? found.value : null;
+    }
+
+    function formatAddress(a) {
+      if (!a) return "-";
+      const parts = [
+        [a.first_name, a.last_name].filter(Boolean).join(" ").trim(),
+        a.company,
+        a.address_1,
+        a.address_2,
+        a.city,
+        a.state,
+        a.postcode,
+        a.country
+      ].filter(Boolean).map(s => String(s).trim()).filter(Boolean);
+
+      return parts.length ? parts.join("\n") : "-";
+    }
+
+    function setMultiline(id, text) {
+      const el = els(id);
+      el.textContent = text;
+      el.style.whiteSpace = "pre-line";
+    }
+
+    function initialsFromName(name) {
+      const words = String(name || "").trim().split(/\s+/).filter(Boolean);
+      if (!words.length) return "--";
+      const a = words[0][0] || "";
+      const b = (words[1] ? words[1][0] : "") || "";
+      return (a + b).toUpperCase();
+    }
+
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 401 -> login
+      if (res.status === 401) {
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+        return null;
+      }
+
+      return res;
+    }
+
+    async function loadOrder() {
+      try {
+        showState("Loading order...");
+        els("saveHint").classList.add("hidden");
+
+        const res = await apiFetch(`/orders/${orderId}`, { method: "GET" });
+        if (!res) return;
+
+        if (!res.ok) {
+          const t = await res.text().catch(() => "");
+          showState(`Order yüklenemedi (${res.status}). ${t ? "Detay: " + t : ""}`);
+          return;
+        }
+
+        const order = await res.json();
+
+        hideState();
+
+        // Title
+        els("orderTitle").textContent = `Order #${safeText(order.id)}`;
+
+        // Status
+        if (order.status) {
+          els("statusSelect").value = order.status;
+        }
+
+        // Customer (billing)
+        const fullName = [order?.billing?.first_name, order?.billing?.last_name].filter(Boolean).join(" ").trim();
+        els("customerName").textContent = safeText(fullName || order?.billing?.email || "Customer");
+
+        const email = safeText(order?.billing?.email);
+        els("customerEmail").textContent = email;
+        els("customerEmail").href = email !== "-" ? `mailto:${email}` : "#";
+
+        const phone = safeText(order?.billing?.phone);
+        els("callBtn").onclick = () => {
+          if (phone === "-") return;
+          window.location.href = `tel:${phone}`;
+        };
+        els("mailBtn").onclick = () => {
+          if (email === "-") return;
+          window.location.href = `mailto:${email}`;
+        };
+
+        els("custInitials").textContent = initialsFromName(fullName || email);
+
+        // Addresses
+        setMultiline("shippingAddress", formatAddress(order.shipping));
+        setMultiline("billingAddress", formatAddress(order.billing));
+
+        // Custom meta fields (wp-admin'de gördüklerin)
+        // Buradaki key'ler senin ekran görüntülerindekiyle aynı:
+        // teslimat_tarihi, teslimat_saati, gonderen_isim, gonderen_telefon, alici_isim, alici_telefon, gonderim_yeri, billing_neighborhood, adres
+        els("teslimatTarihi").textContent = safeText(getMeta(order, "teslimat_tarihi"));
+        els("teslimatSaati").textContent = safeText(getMeta(order, "teslimat_saati"));
+        els("gonderenIsim").textContent = safeText(getMeta(order, "gonderen_isim"));
+        els("gonderenTelefon").textContent = safeText(getMeta(order, "gonderen_telefon"));
+        els("aliciIsim").textContent = safeText(getMeta(order, "alici_isim"));
+        els("aliciTelefon").textContent = safeText(getMeta(order, "alici_telefon"));
+        els("gonderimYeri").textContent = safeText(getMeta(order, "gonderim_yeri"));
+        els("billingNeighborhood").textContent = safeText(getMeta(order, "billing_neighborhood"));
+        els("adresMeta").textContent = safeText(getMeta(order, "adres"));
+
+        // Items
+        const itemsEl = els("itemsContainer");
+        itemsEl.innerHTML = "";
+
+        const lineItems = Array.isArray(order.line_items) ? order.line_items : [];
+        if (!lineItems.length) {
+          itemsEl.innerHTML = `<div class="p-4 text-sm text-slate-300">No items.</div>`;
+        } else {
+          for (const item of lineItems) {
+            const name = safeText(item.name);
+            const qty = safeText(item.quantity);
+            const total = safeText(item.total);
+
+            const row = document.createElement("div");
+            row.className = "flex items-center justify-between gap-4 p-4";
+            row.innerHTML = `
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-white truncate">${name}</p>
+                <p class="mt-1 text-xs text-slate-400">Qty: ${qty}</p>
+              </div>
+              <div class="shrink-0 text-sm font-semibold text-white">${money(total)}</div>
+            `;
+            itemsEl.appendChild(row);
+          }
+        }
+
+        // Summary totals (Woo genelde string döndürür)
+        // Eğer mağaza para birimi TL ise ₺ göstermeyi tercih ettim.
+        // İstersen burayı API'den gelen currency ile dinamik yaparız.
+        els("subtotal").textContent = money(order?.subtotal ?? null);
+        els("shippingTotal").textContent = money(order?.shipping_total ?? null);
+        els("taxTotal").textContent = money(order?.total_tax ?? null);
+        els("orderTotal").textContent = money(order?.total ?? null);
+
+        const pmTitle = safeText(order?.payment_method_title);
+        const pmId = safeText(order?.payment_method);
+        const pm = pmTitle !== "-" ? pmTitle : (pmId !== "-" ? pmId : "-");
+        els("paymentInfo").textContent = pm !== "-" ? `Paid via ${pm}` : "-";
+
+      } catch (e) {
+        showState("Beklenmeyen hata oluştu. Console'u kontrol et.");
+        console.error(e);
+      }
+    }
+
+async function saveStatus() {
+  console.log("SAVE CLICKED");  
+  const status = document.getElementById("statusSelect").value;
+  const hint = document.getElementById("saveHint");
+  const btn = document.getElementById("saveBtn");
+
+  btn.disabled = true;
+  hint.classList.add("hidden");
+
+  try {
+    const res = await fetch(`${API}/orders/${orderId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      hint.textContent = `Status güncellenemedi (${res.status}): ${text}`;
+      hint.classList.remove("hidden");
+      return;
+    }
+
+    hint.textContent = "Status başarıyla güncellendi";
+    hint.classList.remove("hidden");
+
+    await loadOrder(); // veriyi tekrar çek
+  } catch (e) {
+    hint.textContent = "Sunucuya ulaşılamadı";
+    hint.classList.remove("hidden");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+    // NAV
+    els("backBtn").addEventListener("click", () => {
+      // orders.html sayfan varsa oraya dönmek daha mantıklı
+      window.location.href = "dashboard.html";
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", saveStatus);
+
+    // Init
+    loadOrder();
+  </script>
+</body>
+</html>

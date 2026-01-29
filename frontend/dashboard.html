@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orders</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#137fec",
+            "background-dark": "#101922",
+            "surface-dark": "#19232d"
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { min-height: 100dvh; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+  </style>
+</head>
+
+<body class="bg-background-dark text-white font-display antialiased">
+
+<div class="relative flex min-h-screen flex-col pb-20">
+
+  <!-- TOP BAR -->
+  <div class="sticky top-0 z-10 border-b border-gray-800 bg-background-dark">
+    <div class="flex items-center justify-between px-4 py-3">
+      <h1 class="text-xl font-bold">Orders</h1>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="px-4 pb-3">
+      <div class="flex h-12 items-center rounded-lg border border-gray-700 bg-surface-dark">
+        <span class="material-symbols-outlined px-3 text-gray-400">search</span>
+        <input
+          type="text"
+          placeholder="Search orders..."
+          class="h-full w-full bg-transparent px-2 text-sm focus:outline-none"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS LIST -->
+  <div id="orders-list" class="flex flex-col gap-4 p-4">
+    <!-- JS orders buraya -->
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-gray-800 bg-surface-dark">
+  <div class="flex h-16 items-center justify-around">
+
+    <!-- HOME / ORDERS -->
+    <a href="dashboard.html"
+       class="flex flex-col items-center text-primary">
+      <span class="material-symbols-outlined"
+            style="font-variation-settings:'FILL' 1">shopping_bag</span>
+      <span class="text-xs">Orders</span>
+    </a>
+
+    <!-- PRODUCTS -->
+    <a href="products.html"
+       class="flex flex-col items-center text-gray-400">
+      <span class="material-symbols-outlined">inventory_2</span>
+      <span class="text-xs">Products</span>
+    </a>
+
+  </div>
+</nav>
+
+<!-- SCRIPTS -->
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/orders.js"></script>
+
+</body>
+</html>

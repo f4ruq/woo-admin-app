@@ -1,0 +1,22 @@
+# env / secrets
+.env
+notlars.txt
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+woo/
+
+# node (varsa)
+node_modules/
+
+# mac
+.DS_Store
+
+# logs
+*.log
